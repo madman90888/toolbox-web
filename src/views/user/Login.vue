@@ -49,7 +49,7 @@ const router = useRouter()
 const userRef = ref<FormInstance>()
 
 const userForm: User = reactive({
-  username: 'admin',
+  username: '',
   password: ''
 })
 

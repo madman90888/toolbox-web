@@ -29,7 +29,7 @@
     </el-row>
     <!-- 显示操作记录 -->
     <el-dialog title="添加DNS解析" v-model="control.isDialog">
-      <dns-res :data="pageData.resData" :loading="control.isLoading" />
+      <DnsResult :data="pageData.resData" />
     </el-dialog>
   </div>
 </template>
@@ -39,15 +39,15 @@ import { ref, reactive } from 'vue'
 import type { UploadProps, UploadInstance, UploadRawFile } from 'element-plus'
 import { UploadFilled } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { DnsVo } from '@/type'
-import DnsRes from '@/components/DnsRes.vue'
+import { Dns, DnsVo } from '@/type'
+import DnsResult from '@/components/DnsResult.vue'
+import { createDns } from '@/api/flare'
 
 // 文件处理
 const uploadRef = ref<UploadInstance>()
 
 // 控制页面组件显示、可操作性
 const control: Record<string, boolean> = reactive({
-  isLoading: false,
   isDialog: false
 })
 
@@ -68,17 +68,40 @@ const beforeUpload = (rawFile: UploadRawFile) => {
 
 // 显示结果
 const handleSuccess: UploadProps['onSuccess'] = (response: any): void => {
-  console.log(response);
-  pageData.resData = response.data
-  control.isLoading = false
+  const list: Dns[] = response.data
+  pageData.resData = []
+  control.isDialog = true
+
+  list.forEach(async ele => {
+    const item = reactive({
+      name: ele.name,
+      type: ele.type,
+      content: ele.content,
+      ttl: ele.ttl,
+      zone_name: ele.zone_name,
+      success: true,
+      message: ''
+    })
+    // 判断格式是否正确
+    pageData.resData.push(item)
+    if (!item.name || !item.type || !item.content || !item.zone_name) {
+      item.success = false
+      item.message = 'DNS 格式错误'
+      return
+    }
+    let res = await createDns(item)
+    if (!res) return
+    item.message = res.data.message
+    if (!res.data.success) {
+      item.success = false
+    }
+  })
 }
 
 // 手动提交
 const submitForm = (uploadFile: UploadInstance | undefined) => {
   if (!uploadFile) return
   uploadFile.submit()
-  control.isLoading = true
-  control.isDialog = true
 }
 </script>
 

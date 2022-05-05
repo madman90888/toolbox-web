@@ -11,22 +11,12 @@ export interface User {
   password: string;
 }
 
-// 域名添加 修改HTTP格式
-export interface ZoneBatch {
-  zoneNames: string[];
-  jump?: boolean;
-  type?: 'full' | 'partial';
-  auto?: boolean;
-  always?: boolean;
-  ssl?: 'off' | 'flexible' | 'full' | 'strict' | '';
-}
-
 // 域名查询
 export interface ZoneSearch {
   name: string;
   status: 'active' | 'pending' | 'initializing' | 'moved' | 'deleted' | 'deactivated' | string;
-  order: 'id' | 'name' | 'status' | 'paused' | 'type' | 'created_on';
-  direction: 'desc' | 'asc';
+  order: 'id' | 'name' | 'status' | 'paused' | 'type' | 'created_on' | '';
+  direction: 'desc' | 'asc' | '';
   page: number;
   limit: number;
 }
@@ -45,6 +35,13 @@ export interface Zone {
   jumpStart: boolean;
 }
 
+// 域名操作，返回结果
+export interface ZoneRow {
+  name: string;
+  success: boolean;
+  message: string;
+}
+
 // DNS 信息
 export interface Dns {
   id?: string;
@@ -52,7 +49,7 @@ export interface Dns {
   name: string;
   content: string;
   proxiable?: boolean;
-  proxied: boolean;
+  proxied?: boolean;
   ttl?: number;
   zone_id?: string;
   zone_name?: string;
@@ -60,30 +57,7 @@ export interface Dns {
   modified_on?: string;
 }
 
-// 域名删除结果
-export interface IZoneAddDel {
-  success: boolean;
-  name: string;
-  message: string;
-}
-
-// HTTPS设置
-export interface HttpsAndSsl {
-  zoneName: string;
-  auto: {
-    success: boolean;
-    message: string;
-  };
-  always: {
-    success: boolean;
-    message: string;
-  };
-  ssl: {
-    success: boolean;
-    message: string;
-  };
-}
-
+// DNS 操作记录返回
 export interface DnsVo extends Dns {
   success: boolean;
   message: string;

@@ -11,7 +11,7 @@ import router from '@/router'
 // 创建实例
 const service: AxiosInstance = axios.create({
   baseURL: '',
-  timeout: 5000
+  timeout: 60 * 1000 
 })
 
 // 请求拦截器
@@ -21,7 +21,6 @@ service.interceptors.request.use(
     return config
   },
   error => {
-    console.log('发起请求错误：', error)
     return Promise.reject(error)
   }
 )

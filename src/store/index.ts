@@ -48,6 +48,7 @@ export default createStore({
       }
       return false
     },
+    // 获取令牌
     async getFlareToken({ state }) {
       if (state.flareToken) {
         return state.flareToken
@@ -58,6 +59,7 @@ export default createStore({
         return res.data.token
       }
     },
+    // 设置令牌
     setTokan({ state }, status): void {
       state.flareToken = status
     },

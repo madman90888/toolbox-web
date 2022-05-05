@@ -26,9 +26,13 @@
       v-loading="control.isLoading"
       :default-sort="{ prop: zoneForm.order, order: zoneForm.direction == 'des' ? 'descending' : 'descending' }"
       @sort-change="sortHandler"
+      @row-click="getDns"
     >
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="name" label="域名" sortable="custom"></el-table-column>
+      <el-table-column prop="name" 
+        label="域名"
+        sortable="custom"
+        ></el-table-column>
       <el-table-column prop="status" label="状态" width="180" sortable="custom">
         <template #default="scope">
           <el-tag :type="statusColor(scope.row.status)">{{ statusList[scope.row.status] }}</el-tag>
@@ -52,8 +56,11 @@
     ></el-pagination>
     <!-- 显示批量操作记录 -->
     <el-dialog title="批量删除" v-model="control.isDialog">
-      <ZoneAddDel :data="pageData.deleteData"
-        :loading="control.isDialogLoading" />
+      <zone-result :data="pageData.resData" />
+    </el-dialog>
+    <el-dialog title="DNS记录" v-model="control.isDNS">
+      <dns-list :data="pageData.dnsList" :isLoading="control.isDnsLoad"
+        @getDns="getDns" />
     </el-dialog>
   </el-card>
 </template>
@@ -61,11 +68,12 @@
 <script setup lang="ts">
 import { reactive, toRaw, watchEffect } from 'vue'
 import { Search as SearchIcon, Download } from '@element-plus/icons-vue'
-import { queryZone, deleteZone, downloadZone } from '@/api/flare'
+import { queryZone, deleteZone, downloadZone, queryDns } from '@/api/flare'
 import { parseTime } from '@/utils'
-import { ZoneSearch, Zone, IZoneAddDel } from '@/type'
+import { ZoneSearch, Zone, ZoneRow, Dns } from '@/type'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import ZoneAddDel from '@/components/ZoneAddDel.vue'
+import ZoneResult from '@/components/ZoneResult.vue'
+import DnsList from '@/components/DnsList.vue'
 
 // 状态列表 固定值
 const statusList: Record<string, string> = {
@@ -80,8 +88,8 @@ const statusList: Record<string, string> = {
 const zoneForm: ZoneSearch = reactive({
   name: '',
   status: '',
-  order: 'created_on',
-  direction: 'desc',
+  order: '',
+  direction: '',
   page: 1,
   limit: 10
 })
@@ -91,7 +99,8 @@ const control: Record<string, boolean> = reactive({
   isClick: true,         // 多选按钮是否可以点击删除
   isDialog: false,   // 是否显示批量结果
   isLoading: false,    // 搜索加载
-  isDialogLoading: false
+  isDNS: false,
+  isDnsLoad: false
 })
 
 const pageData: {
@@ -99,13 +108,15 @@ const pageData: {
   selectList: Zone[];
   total?: number;
   pageCount?: number;
-  deleteData: IZoneAddDel[];
+  resData: ZoneRow[];
+  dnsList: Dns[];
 } = reactive({
   zoneList: [],   // 服务器返回的域名信息列表
   selectList: [], // 选择的域名列表
   total: 0,
   pageCount: 0,
-  deleteData: []
+  resData: [],
+  dnsList: []
 })
 // 监听数据变化
 watchEffect(()=>{
@@ -130,7 +141,7 @@ async function getZones(): Promise<void> {
     }
   }
   const result = await queryZone(form)
-  
+  // 赋值响应数据
   if (result) {
     const data = result.data
     pageData.zoneList = data.record
@@ -166,21 +177,31 @@ function deleteSelectZone() {
     cancelButtonText: "取消",
     type: "warning",
   })
-    .then(async () => {
-      // 遍历过滤要删除域名的数组
-      let list: string[] = pageData.selectList.map(val => val.name) as string[]
-      if (list.length == 0) {
+    .then(() => {
+      // 重置删除列表
+      pageData.resData = []
+      if (pageData.selectList.length == 0) {
+        ElMessage.error('未选择域名，删除失败')
         return;
       }
-      
-      // 显示dialog，展示数据
+      // 获取域名数组，遍历发送请求
       control.isDialog = true
-      control.isDialogLoading = true
-      // 请求接口
-      let res = await deleteZone(list)
-      pageData.deleteData = res.data
-      ElMessage.success("删除成功!")
-      control.isDialogLoading = false
+      pageData.selectList.forEach(async val => {
+        const item = reactive({
+                name: val.name,
+                success: true,
+                message: ''
+              })
+        pageData.resData.push(item)
+        // 发送请求，显示结果
+        let res = await deleteZone(item.name)
+        if (!res) return
+        item.message = res.data.message
+        if (!res.data.success) {
+          item.success = false
+        }
+      })
+      ElMessage.info(`删除 ${pageData.resData.length} 条域名`)
       // 重新加载数据
       getZones()
     })
@@ -221,12 +242,20 @@ async function download() {
       break
     }
   }
-  const result = await downloadZone(form)
+  await downloadZone(form)
   control.isLoading = false
-  if (result) {
-    ElMessage.error('下载失败')
-  }else{
-     ElMessage.success('下载成功')
+  ElMessage.success('下载成功')
+}
+// 根据域名获取DNS记录
+async function getDns(row: Zone, column: { label: string }) {
+  if(column.label !== '域名') return
+  pageData.dnsList = []
+  control.isDnsLoad = true
+  control.isDNS = true
+  const res = await queryDns({ zone_id: row.id } )
+  control.isDnsLoad = false
+  if (res) {
+    pageData.dnsList = res.data
   }
 }
 </script>

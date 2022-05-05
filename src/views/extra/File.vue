@@ -125,10 +125,12 @@ const handleExceed: UploadProps['onExceed'] = (files, uploadFiles) => {
   )
 }
 
+// 成功返回结果
 const handleSuccess: UploadProps['onSuccess'] = (response: any): void => {
   resData.push(response.data)
 }
 
+// 上传文件
 const submitForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate((valid) => {

@@ -56,16 +56,14 @@ import {
   Files as FilesIcon
 } from '@element-plus/icons-vue'
 import { useRoute } from 'vue-router'
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 
 const route = useRoute()
 const navUrl = ref<string>(route.path)
 watch(() => route.path, () => {
-  console.log("@@@", navUrl.value);
-  console.log(route.path);
-  navUrl.value = route.path
-  
-  console.log("###", navUrl.value);
+  nextTick(() => {
+    navUrl.value = route.path
+  })
 })
 
 </script>

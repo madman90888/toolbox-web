@@ -20,7 +20,7 @@
     </el-form>
     <!-- 显示批量操作记录 -->
     <el-dialog title="添加DNS解析" v-model="control.isDialog">
-      <DnsDelRes :data="pageData.resData" :loading="control.isLoading" />
+      <zone-result :data="pageData.resData" />
     </el-dialog>
 </template>
 
@@ -29,8 +29,8 @@ import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { validateZoneName, splitZoneName } from '@/utils'
 import { deleteDns } from '@/api/flare'
-import { DnsVo } from '@/type'
-import DnsDelRes from '@/components/DnsDelRes.vue'
+import { ZoneRow } from '@/type'
+import ZoneResult from '@/components/ZoneResult.vue'
 
 const formRef = ref<FormInstance>()
 const formData: {
@@ -48,30 +48,38 @@ const rules = reactive({
 
 // 控制页面组件显示、可操作性
 const control: Record<string, boolean> = reactive({
-  isLoading: false,
   isDialog: false
 })
 
 // 数据存放
 const pageData: {
-  resData: DnsVo[]
+  resData: ZoneRow[]
 } = reactive({
   resData: []
 })
 
 function submit(formEl: FormInstance | undefined): void {
   if (!formEl) return
-  formEl.validate(async valid => {
+  formEl.validate(valid => {
     if (!valid) return
-    control.isLoading = true
+    pageData.resData = []
     control.isDialog = true
-    // 整理数据
+    // 获取域名数组
     const names = splitZoneName(formData.zoneNames)
-    
-    let res = await deleteDns(names)
-    // 展示数据
-    pageData.resData = res.data
-    control.isLoading = false
+    names.forEach(async name => {
+      const item = reactive({
+        name,
+        success: true,
+        message: ''
+      })
+      pageData.resData.push(item)
+      let res = await deleteDns(name)
+      if (!res) return
+      item.message = res.data.message
+      if (!res.data.success) {
+        item.success = false
+      }
+    })
   })
 }
 </script>

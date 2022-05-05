@@ -19,10 +19,25 @@
           </el-form-item>
         </el-col>
       </el-row>
+      <el-row>
+        <el-col :span="22" style="padding-left: 70px;">
+          前往 CloudFlare <a href="https://dash.cloudflare.com/profile/api-tokens">创建 API 令牌</a>
+        </el-col>
+        <br>
+        <el-col :span="12"  style="padding-left: 120px;">
+          需要三个编辑权限：区域、区域设置、DNS
+        </el-col>
+      </el-row>
       <el-form-item>
         <el-button type="primary" @click="save(formRef)">保存令牌</el-button>
         <el-button type="danger" @click="clear">删除令牌</el-button>
       </el-form-item>
+      <el-row>
+        <el-col :span="24">
+          <p>请求限制时间：{{ formData.time }}</p><br>
+          <p>五分钟内请求次数：{{ formData.count }}</p>
+        </el-col>
+      </el-row>
     </el-form>
   </el-card>
 </template>
@@ -33,16 +48,23 @@ import { FormInstance, ElMessage } from 'element-plus'
 import { getToken, verifyFlareToken, deleteToken } from '@/api/flare'
 import { AES_ECB_decrypt, AES_ECB_encrypt } from '@/utils/auth'
 import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 
 const key = '11f6fa0a98f58bhk'
+
+const route = useRoute()
 
 const formRef = ref<FormInstance>()
 const formData: {
   expire: number;
   token: string;
+  time: string;
+  count: string;
 } = reactive({
   expire: 1,
-  token: ''
+  token: '',
+  time: '',
+  count: ''
 })
 const rules = reactive({
   expire: [
@@ -54,10 +76,13 @@ const rules = reactive({
 })
 
 onMounted(async () => {
+  if (route.query.is) return
   const res = await getToken()
   if (res) {
     formData.expire = res.data.expire
     formData.token = AES_ECB_decrypt(res.data.token, key)
+    formData.time = res.data.request_start
+    formData.count = res.data.count
   }
 })
 
@@ -69,7 +94,7 @@ function save(formEl: FormInstance | undefined) {
   if (!formEl) return
   formEl.validate(async valid => {
     if (!valid) return
-    const res = await verifyFlareToken(AES_ECB_encrypt(formData.token, key), formData.expire.toString())
+    const res = await verifyFlareToken(AES_ECB_encrypt(formData.token.trim(), key), formData.expire.toString())
     if (res) {
       store.dispatch('setTokan', 'token')
       ElMessage.success('令牌有效，状态：' + res.data.status)
@@ -98,5 +123,13 @@ function clear() {
 <style scoped>
 .el-row {
   margin: 20px 0;
+}
+a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+}
+a:hover {
+  color: red;
 }
 </style>

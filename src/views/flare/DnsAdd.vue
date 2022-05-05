@@ -52,7 +52,7 @@
     </el-form>
     <!-- 显示批量操作记录 -->
     <el-dialog title="添加DNS解析" v-model="control.isDialog">
-      <DnsRes :data="pageData.resData" :loading="control.isLoading" />
+      <DnsResult :data="pageData.resData" />
     </el-dialog>
 </template>
 
@@ -62,7 +62,7 @@ import type { FormInstance } from 'element-plus'
 import { validateZoneName, splitZoneName } from '@/utils'
 import { createDns } from '@/api/flare'
 import { Dns, DnsVo } from '@/type'
-import DnsRes from '@/components/DnsRes.vue'
+import DnsResult from '@/components/DnsResult.vue'
 interface DnsForm extends Dns {
   zoneNames?: string
 }
@@ -91,7 +91,6 @@ const rules = reactive({
 
 // 控制页面组件显示、可操作性
 const control: Record<string, boolean> = reactive({
-  isLoading: false,
   isDialog: false
 })
 
@@ -104,25 +103,31 @@ const pageData: {
 
 function submit(formEl: FormInstance | undefined): void {
   if (!formEl) return
-  formEl.validate(async valid => {
+  formEl.validate(valid => {
     if (!valid) return
-    control.isLoading = true
+    pageData.resData = []
     control.isDialog = true
-    // 整理数据
+    // 获取域名数组，遍历发送请求
     const names = splitZoneName(formData.zoneNames as string)
-    const list: Dns[] = []
-    const baseDns = Object.assign({}, formData)
-    delete baseDns.zoneNames
-    names.forEach(name => {
-      let dns = Object.assign({}, baseDns)
-      dns.zone_name = name
-      list.push(dns)
+    names.forEach(async name => {
+      const item = reactive({
+        name: formData.name,
+        type: formData.type,
+        content: formData.content,
+        proxied: formData.proxied,
+        ttl: formData.ttl,
+        zone_name: name,
+        success: true,
+        message: ''
+      })
+      pageData.resData.push(item)
+      let res = await createDns(item)
+      if (!res) return
+      item.message = res.data.message
+      if (!res.data.success) {
+        item.success = false
+      }
     })
-    
-    let res = await createDns(list)
-    // 展示数据
-    pageData.resData = res.data
-    control.isLoading = false
   })
 }
 </script>

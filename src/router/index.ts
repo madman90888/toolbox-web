@@ -95,7 +95,7 @@ router.beforeEach(async to => {
   // 令牌
   if (to.meta.isFlareToken) {
     if (!(await store.dispatch('getFlareToken'))) {
-      return '/flare/setting'
+      return '/flare/setting?is=no'
     }
   }
   
