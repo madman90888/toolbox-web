@@ -9,6 +9,7 @@
         :rules="userRules"
         label-width="0px"
         class="login-form"
+        @keydown.enter="login(userRef)"
       >
       <el-form-item prop="username">
         <el-input 

@@ -15,6 +15,12 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "flare" */ '@/views/flare/Zone.vue')
       },
       {
+        path: '/zoneAll',
+        name: 'ZoneAll',
+        meta: { title: '域名HTTPS状态', isFlareToken: true },
+        component: () => import(/* webpackChunkName: "flare" */ '@/views/flare/ZoneAll.vue')
+      },
+      {
         path: '/zone/batch',
         name: 'ZoneBatch',
         meta: { title: '域名设置', isFlareToken: true },

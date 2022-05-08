@@ -13,6 +13,11 @@
       <el-tab-pane label="HTTPS设置" name="https">
         <ZoneHttps />
       </el-tab-pane>
+      <el-tab-pane label="HTTPS列表查询" name="status">
+        <p style="color:red">注意：</p>
+        <p style="margin: 10px 0;">该功能不能频繁使用，或查询大量域名，否则将会导致API身份令牌被锁定</p>
+        <router-link to="/zoneAll">显示域名HTTPS状态</router-link>
+      </el-tab-pane>
     </el-tabs>
   </el-card>
 </template>

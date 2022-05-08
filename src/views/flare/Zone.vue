@@ -1,7 +1,7 @@
 <template>
   <el-card>
     <!-- 搜索 -->
-    <el-row :gutter="20" class="search">
+    <el-row :gutter="20" class="search" @keydown.enter="getZones">
       <el-col :span="5">
         <el-input placeholder="域名" clearable v-model="zoneForm.name"></el-input>
       </el-col>
@@ -24,15 +24,19 @@
       style="width: 100%"
       @selection-change="handleSelectionChange"
       v-loading="control.isLoading"
-      :default-sort="{ prop: zoneForm.order, order: zoneForm.direction == 'des' ? 'descending' : 'descending' }"
+      :default-sort="{ prop: zoneForm.order, order: zoneForm.direction == 'des' ? 'descending' : 'ascending' }"
       @sort-change="sortHandler"
-      @row-click="getDns"
+      @cell-dblclick="getDns"
     >
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column prop="name" 
         label="域名"
         sortable="custom"
-        ></el-table-column>
+        >
+        <template #default="{ row }">
+          <div  @click.ctrl="clickZone(row)">{{ row.name }}</div>
+        </template>
+        </el-table-column>
       <el-table-column prop="status" label="状态" width="180" sortable="custom">
         <template #default="scope">
           <el-tag :type="statusColor(scope.row.status)">{{ statusList[scope.row.status] }}</el-tag>
@@ -44,7 +48,7 @@
     </el-table>
     <!-- 批量删除 -->
     <div style="margin-top: 20px">
-      <el-button @click="deleteSelectZone" :disabled="control.isClick">删除域名</el-button>
+      <el-button @click="deleteSelectZone" :disabled="control.isClick">删除{{ pageData.selectList.length == 0 ? '' : ` ${pageData.selectList.length}条 `}}域名</el-button>
     </div>
     <!-- 分页 -->
     <el-pagination
@@ -149,6 +153,11 @@ async function getZones(): Promise<void> {
     pageData.pageCount = data.pages
   }
   control.isLoading = false
+}
+
+// 点击域名在新窗口打开
+const clickZone = (zone: Zone) => {
+  window.open('http://' + zone.name)
 }
 
 // 排序

@@ -3,7 +3,7 @@
     <ul class="infinite-list" style="overflow: auto">
       <li v-for="t in pageData.list" :key="t" class="infinite-list-item">{{ t }}</li>
     </ul>
-    <div class="input">
+    <div class="input" @keydown.enter="pushMsg">
       <el-input v-model="pageData.text" placeholder="请输入文字" size="large" />
     </div>
     <div class="button">

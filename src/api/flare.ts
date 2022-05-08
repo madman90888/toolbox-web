@@ -67,6 +67,17 @@ export const updateAutoHttps = (name: string, status: boolean): Promise<ResultDa
 }
 
 /**
+ * 自动跳转 HTTPS 状态
+ * @param name 域名
+ * @returns 
+ */
+export const getAutoHttps = (name: string): Promise<ResultData> => {
+  return request.get('flare/zones/auto_https', {
+    params: { name }
+  })
+}
+
+/**
  * 始终使用 HTTPS
  * @param name 域名
  * @param status 状态
@@ -80,6 +91,17 @@ export const updateAlwaysUseHttps = (name: string, status: boolean): Promise<Res
 }
 
 /**
+ * 始终使用 HTTPS 状态
+ * @param name 域名
+ * @returns 
+ */
+export const getAlwaysUseHttps = (name: string): Promise<ResultData> => {
+  return request.get('flare/zones/always_use_https', {
+    params: { name }
+  })
+}
+
+/**
  * SSL 级别
  * @param name 域名
  * @param value 级别
@@ -88,6 +110,17 @@ export const updateAlwaysUseHttps = (name: string, status: boolean): Promise<Res
 export const updateSSL = (name: string, value: string): Promise<ResultData> => {
   return request.patch('flare/zones/ssl', {
     name, value
+  })
+}
+
+/**
+ * SSL 级别
+ * @param name 域名
+ * @returns 
+ */
+export const getSSL = (name: string): Promise<ResultData> => {
+  return request.get('flare/zones/ssl', {
+    params: { name }
   })
 }
 

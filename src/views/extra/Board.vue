@@ -6,7 +6,9 @@
         ref="formRef"
         :model="formData"
         :rules="rules"
-        label-width="80px">
+        label-width="80px"
+        @keydown.enter="submit(formRef)"
+        >
         <el-form-item label="标识符" prop="mark">
           <el-row>
             <el-input
@@ -37,7 +39,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import type { FormInstance } from 'element-plus'
-import { getMesList, createMsg } from '@/api/msg'
+import { createMsg } from '@/api/msg'
 import ruoter from '@/router'
 
 const formRef = ref<FormInstance>()
@@ -45,20 +47,10 @@ const formData = reactive({
   mark: '',
   time: 1
 })
-const checkMark = async (rule: any, value: any, callback: any) => {
-  if (!value) {
-    return callback(new Error('标识符不能为空'))
-  }
-  const result = await getMesList(value)
-  if (result  != undefined) {
-    return callback(new Error(result.message))
-  }
-  callback()
-}
 
 const rules = reactive({
-  mark: [{ validator: checkMark, trigger: 'blur' }],
-  time: [{ required: true, message: '不能为空', trigger: 'blur' }],
+  mark: [{ required: true, message: '标识不能为空', trigger: 'blur' }],
+  time: [{ required: true, message: '有效时间不能为空', trigger: 'blur' }],
 })
 
 const submit = async (formEl: FormInstance | undefined) => {

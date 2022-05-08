@@ -1,6 +1,7 @@
 <template>
   <el-form :model="formData" ref="formRef" 
-  :rules="rules" label-width="100px" class="box">
+    :rules="rules" label-width="100px" class="box"
+    @keydown.enter="submit(formRef)">
     <el-form-item label="旧密码" prop="oldPass">
       <el-input v-model="formData.oldPass" 
       type="password" placeholder="请输入旧密码" show-password />
