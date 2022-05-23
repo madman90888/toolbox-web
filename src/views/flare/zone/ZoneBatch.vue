@@ -24,9 +24,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import ZoneAdd from '@/views/flare/ZoneAdd.vue'
-import ZoneDel from '@/views/flare/ZoneDel.vue'
-import ZoneHttps from '@/views/flare/ZoneHttps.vue'
+import ZoneAdd from '@/views/flare/zone/ZoneAdd.vue'
+import ZoneDel from '@/views/flare/zone/ZoneDel.vue'
+import ZoneHttps from '@/views/flare/zone/ZoneHttps.vue'
 
 const activeName = ref('add')
 

@@ -4,10 +4,10 @@
  * @param string cFormat  格式
  * @return string|null  返回格式化字符串
  */
- export function parseTime(time: string | number | Date, cFormat?: string): string | void {
+ export function parseTime(time: string | number | Date, cFormat?: string): string {
   // 传入时间是否为空
   if (arguments.length === 0 || !time) {
-    return;
+    return '';
   }
   // 若没有指定时间格式，则使用默认
   const format: string = cFormat || 'y-M-d h:m:s'
@@ -81,4 +81,20 @@ export const validateZoneName = (rule: any, value: any, callback: any): void => 
  */
 export const splitZoneName = (nameStr: string): string[] => {
   return Array.from(new Set(nameStr.trim().split(/\s+/)))
+}
+
+import { ElMessageBox, ElMessage } from 'element-plus'
+
+export const confirm = (title: string, message: string, callback: any, fail?: string): void => {
+  ElMessageBox.confirm(message, title, {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+  .then(() => {
+    callback()
+  })
+  .catch(() => {
+    ElMessage.info(fail || '已取消')
+  })
 }

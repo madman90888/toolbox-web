@@ -62,3 +62,58 @@ export interface DnsVo extends Dns {
   success: boolean;
   message: string;
 }
+
+// 域名搜索表单
+export interface DomainForm {
+  name: string;
+  code: string;
+  groupName: string;
+  pageName: string;
+  remark: string;
+  createTime: string;
+  updateTime: string;
+  current: number;
+  limit: number;
+  sort: string;
+  direction: 'asc' | 'desc';
+}
+
+// 域名
+export interface Domain {
+  id: number;
+  name: string;
+  code: string;
+  remark: string;
+  createTime: string;
+  updateTime: string;
+  groupId: number;
+  groupName: string;
+  pageName: string;
+}
+
+// 添加
+export interface DomainAdd {
+  name: string;
+  code: string;
+  groupName: string;
+  pageName: string;
+  remark: string;
+}
+
+export interface DomainUpdate {
+  id: number;
+  name: string;
+  code: string;
+  remark: string;
+  groupId: number;
+  pageName: string;
+}
+export interface Groups {
+  id?: number;
+  name?: string;
+  remark?: string;
+  createTime?: string;
+  updateTime?: string;
+  domainCount?: number;
+  invitationCount?: number;
+}

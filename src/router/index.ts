@@ -9,28 +9,52 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       { path: '', name: 'Welcome', component: () => import(/* webpackChunkName: "main" */  '@/views/Welcome.vue') },
       {
+        path: '/domain',
+        name: 'Domain',
+        meta: { title: '邀请码列表' },
+        component: () => import(/* webpackChunkName: "invitation" */ '@/views/invitation/domain/DomainList.vue')
+      },
+      {
+        path: '/group',
+        name: 'Group',
+        meta: { title: '小组管理' },
+        component: () => import(/* webpackChunkName: "invitation" */ '@/views/invitation/group/GroupList.vue')
+      },
+      {
+        path: '/statisPage',
+        name: 'StatisPage',
+        meta: { title: '静态页列表' },
+        component: () => import(/* webpackChunkName: "invitation" */ '@/views/invitation/PageList.vue')
+      },
+      {
+        path: '/indexSetting',
+        name: 'IndexSetting',
+        meta: { title: '防爬配置' },
+        component: () => import(/* webpackChunkName: "invitation" */ '@/views/invitation/IndexSetting.vue')
+      },
+      {
         path: '/zone',
         name: 'Zone',
         meta: { title: '域名列表', isFlareToken: true },
-        component: () => import(/* webpackChunkName: "flare" */ '@/views/flare/Zone.vue')
+        component: () => import(/* webpackChunkName: "flare" */ '@/views/flare/zone/ZoneList.vue')
       },
       {
         path: '/zoneAll',
         name: 'ZoneAll',
         meta: { title: '域名HTTPS状态', isFlareToken: true },
-        component: () => import(/* webpackChunkName: "flare" */ '@/views/flare/ZoneAll.vue')
+        component: () => import(/* webpackChunkName: "flare" */ '@/views/flare/zone/ZoneAll.vue')
       },
       {
         path: '/zone/batch',
         name: 'ZoneBatch',
         meta: { title: '域名设置', isFlareToken: true },
-        component: () => import(/* webpackChunkName: "flare" */ '@/views/flare/ZoneBatch.vue')
+        component: () => import(/* webpackChunkName: "flare" */ '@/views/flare/zone/ZoneBatch.vue')
       },
       {
         path: '/dns',
         name: 'Dns',
         meta: { title: 'DNS解析', isFlareToken: true },
-        component: () => import(/* webpackChunkName: "flare" */ '@/views/flare/Dns.vue')
+        component: () => import(/* webpackChunkName: "flare" */ '@/views/flare/dns/DnsSet.vue')
       },
       {
         path: '/flare/setting',
@@ -80,6 +104,8 @@ router.beforeEach(async to => {
   // 标题设置
   if (to.meta.title) {
     document.title = to.meta.title as string
+  } else {
+    document.title = '管理后台'
   }
 
   if (to.path === '/m' || /^\/m\/.+/.test(to.path)) {

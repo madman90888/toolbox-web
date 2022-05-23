@@ -19,9 +19,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import DnsAdd from '@/views/flare/DnsAdd.vue'
-import DnsDel from '@/views/flare/DnsDel.vue'
-import DnsFile from '@/views/flare/DnsFile.vue'
+import DnsAdd from '@/views/flare/dns/DnsAdd.vue'
+import DnsDel from '@/views/flare/dns/DnsDel.vue'
+import DnsFile from '@/views/flare/dns/DnsFile.vue'
 
 const activeName = ref('add')
 

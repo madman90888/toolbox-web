@@ -24,7 +24,7 @@
       style="width: 100%"
       @selection-change="handleSelectionChange"
       v-loading="control.isLoading"
-      :default-sort="{ prop: zoneForm.order, order: zoneForm.direction == 'des' ? 'descending' : 'ascending' }"
+      :default-sort="{ prop: zoneForm.order, order: zoneForm.direction == 'desc' ? 'descending' : 'ascending' }"
       @sort-change="sortHandler"
       @cell-dblclick="getDns"
     >
@@ -164,7 +164,7 @@ const clickZone = (zone: Zone) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function sortHandler({column, prop, order}: any) {
   zoneForm.order = prop
-  zoneForm.direction = order=='ascending' ? 'asc' : 'desc'
+  zoneForm.direction = order == 'ascending' ? 'asc' : 'desc'
   getZones()
 }
 
